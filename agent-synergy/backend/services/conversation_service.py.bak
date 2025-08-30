@@ -1,0 +1,197 @@
+from typing import List, Optional, Dict, Any
+from datetime import datetime
+import uuid
+from models.conversation import ConversationCreate, ConversationUpdate, ConversationResponse
+from models.user import User
+from core.database import get_supabase
+
+class ConversationService:
+    def __init__(self):
+        self.supabase = get_supabase()
+
+    async def create_conversation(self, conversation_data: ConversationCreate, user: User) -> ConversationResponse:
+        """Create a new conversation"""
+        conversation_id = str(uuid.uuid4())
+        
+        conversation = {
+            "id": conversation_id,
+            "user_id": user.id,
+            "agent_id": conversation_data.agent_id,
+            "title": conversation_data.title or "New Conversation",
+            "status": "active",
+            "conversation_type": conversation_data.conversation_type,
+            "metadata": conversation_data.metadata or {},
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        }
+        
+        result = self._get_supabase().table("conversations").insert(conversation).execute()
+        
+        if result.data:
+            return ConversationResponse(**result.data[0])
+        raise Exception("Failed to create conversation")
+
+    async def get_conversation(self, conversation_id: str, user: User) -> Optional[ConversationResponse]:
+        """Get a specific conversation by ID"""
+        result = self._get_supabase().table("conversations").select("*").eq("id", conversation_id).eq("user_id", user.id).execute()
+        
+        if result.data:
+            return ConversationResponse(**result.data[0])
+        return None
+
+    async def get_user_conversations(
+        self, 
+        user: User, 
+        agent_id: Optional[str] = None,
+        status: Optional[str] = None,
+        limit: int = 50,
+        offset: int = 0
+    ) -> List[ConversationResponse]:
+        """Get conversations for a user with optional filters"""
+        query = self._get_supabase().table("conversations").select("*").eq("user_id", user.id)
+        
+        if agent_id:
+            query = query.eq("agent_id", agent_id)
+        if status:
+            query = query.eq("status", status)
+            
+        result = query.order("updated_at", desc=True).range(offset, offset + limit - 1).execute()
+        
+        return [ConversationResponse(**conv) for conv in result.data]
+
+    async def update_conversation(
+        self, 
+        conversation_id: str, 
+        updates: ConversationUpdate, 
+        user: User
+    ) -> Optional[ConversationResponse]:
+        """Update a conversation"""
+        # Verify ownership
+        existing = await self.get_conversation(conversation_id, user)
+        if not existing:
+            return None
+            
+        update_data = updates.dict(exclude_unset=True)
+        update_data["updated_at"] = datetime.utcnow().isoformat()
+        
+        result = self._get_supabase().table("conversations").update(update_data).eq("id", conversation_id).execute()
+        
+        if result.data:
+            return ConversationResponse(**result.data[0])
+        return None
+
+    async def delete_conversation(self, conversation_id: str, user: User) -> bool:
+        """Delete a conversation"""
+        # Verify ownership
+        existing = await self.get_conversation(conversation_id, user)
+        if not existing:
+            return False
+            
+        result = self._get_supabase().table("conversations").delete().eq("id", conversation_id).execute()
+        return len(result.data) > 0
+
+    async def add_message(
+        self, 
+        conversation_id: str, 
+        role: str, 
+        content: str, 
+        user: User,
+        metadata: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """Add a message to a conversation"""
+        # Verify conversation ownership
+        conversation = await self.get_conversation(conversation_id, user)
+        if not conversation:
+            raise Exception("Conversation not found or access denied")
+            
+        message_id = str(uuid.uuid4())
+        message = {
+            "id": message_id,
+            "conversation_id": conversation_id,
+            "role": role,
+            "content": content,
+            "metadata": metadata or {},
+            "created_at": datetime.utcnow().isoformat()
+        }
+        
+        result = self._get_supabase().table("conversation_messages").insert(message).execute()
+        
+        if result.data:
+            # Update conversation timestamp
+            await self.update_conversation(
+                conversation_id, 
+                ConversationUpdate(updated_at=datetime.utcnow()), 
+                user
+            )
+            return result.data[0]
+        raise Exception("Failed to add message")
+
+    async def get_conversation_messages(
+        self, 
+        conversation_id: str, 
+        user: User,
+        limit: int = 100,
+        offset: int = 0
+    ) -> List[Dict[str, Any]]:
+        """Get messages for a conversation"""
+        # Verify conversation ownership
+        conversation = await self.get_conversation(conversation_id, user)
+        if not conversation:
+            return []
+            
+        result = self._get_supabase().table("conversation_messages").select("*").eq("conversation_id", conversation_id).order("created_at", desc=False).range(offset, offset + limit - 1).execute()
+        
+        return result.data
+
+    async def mark_conversation_completed(self, conversation_id: str, user: User) -> bool:
+        """Mark a conversation as completed"""
+        return await self.update_conversation(
+            conversation_id,
+            ConversationUpdate(status="completed"),
+            user
+        ) is not None
+
+    async def get_conversation_analytics(
+        self, 
+        user: User, 
+        timeframe: str = "week"
+    ) -> Dict[str, Any]:
+        """Get conversation analytics for a user"""
+        # Get conversations in timeframe
+        from datetime import timedelta
+        now = datetime.utcnow()
+        
+        if timeframe == "day":
+            start_date = now - timedelta(days=1)
+        elif timeframe == "week":
+            start_date = now - timedelta(weeks=1)
+        elif timeframe == "month":
+            start_date = now - timedelta(days=30)
+        else:
+            start_date = now - timedelta(weeks=1)
+            
+        result = self._get_supabase().table("conversations").select("*").eq("user_id", user.id).gte("created_at", start_date.isoformat()).execute()
+        
+        conversations = result.data
+        total_conversations = len(conversations)
+        active_conversations = len([c for c in conversations if c.get("status") == "active"])
+        completed_conversations = len([c for c in conversations if c.get("status") == "completed"])
+        
+        # Get message count
+        if conversations:
+            conversation_ids = [c["id"] for c in conversations]
+            message_result = self._get_supabase().table("conversation_messages").select("id").in_("conversation_id", conversation_ids).execute()
+            total_messages = len(message_result.data)
+        else:
+            total_messages = 0
+            
+        return {
+            "total_conversations": total_conversations,
+            "active_conversations": active_conversations,
+            "completed_conversations": completed_conversations,
+            "total_messages": total_messages,
+            "timeframe": timeframe
+        }
+
+# Export service instance
+conversation_service = ConversationService()
