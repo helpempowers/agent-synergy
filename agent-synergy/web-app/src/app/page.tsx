@@ -5,39 +5,26 @@ import {
   Bot, 
   MessageSquare, 
   BarChart3, 
-  Settings, 
-  Users, 
   Zap,
   Activity,
   Shield,
   Database,
   Code,
-  Play,
-  Pause,
-  AlertCircle,
   CheckCircle,
-  Clock,
   TrendingUp,
-  Cpu,
-  Brain,
-  Globe,
-  Lock,
-  Key,
-  Server,
-  Network,
-  Monitor,
-  BarChart,
-  PieChart,
-  LineChart,
-  Target,
   Rocket,
   Star,
-  Award,
-  Crown,
-  Sparkles
+  ArrowRight,
+  Play,
+  Users,
+  Globe,
+  Server,
+  Brain,
+  Key,
+  Lock
 } from 'lucide-react';
 
-export default function Dashboard() {
+export default function LandingPage() {
   const [activeTab, setActiveTab] = useState('overview');
 
   const navigationItems = [
@@ -81,7 +68,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-        <div className="container-responsive">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <div className="relative">
@@ -94,7 +81,7 @@ export default function Dashboard() {
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <span className="text-sm text-gray-500">API Status: </span>
-                <span className="status-badge status-active">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                   Operational
                 </span>
               </div>
@@ -114,7 +101,7 @@ export default function Dashboard() {
                   <li key={item.id}>
                     <button
                       onClick={() => setActiveTab(item.id)}
-                      className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 focus-ring ${
+                      className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                         activeTab === item.id
                           ? `${item.bgColor} text-gray-900 border-r-2 border-green-500 shadow-sm`
                           : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:shadow-sm'
@@ -152,7 +139,7 @@ function OverviewTab() {
       
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
-        <div className="card hover-lift">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
           <div className="flex items-center">
             <div className="p-3 bg-green-100 rounded-lg">
               <Bot className="h-8 w-8 text-green-600" />
@@ -168,7 +155,7 @@ function OverviewTab() {
           </div>
         </div>
         
-        <div className="card hover-lift">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
           <div className="flex items-center">
             <div className="p-3 bg-purple-100 rounded-lg">
               <MessageSquare className="h-8 w-8 text-purple-600" />
@@ -184,7 +171,7 @@ function OverviewTab() {
           </div>
         </div>
         
-        <div className="card hover-lift">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
           <div className="flex items-center">
             <div className="p-3 bg-orange-100 rounded-lg">
               <BarChart3 className="h-8 w-8 text-orange-600" />
@@ -200,7 +187,7 @@ function OverviewTab() {
           </div>
         </div>
         
-        <div className="card hover-lift">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
           <div className="flex items-center">
             <div className="p-3 bg-yellow-100 rounded-lg">
               <Zap className="h-8 w-8 text-yellow-600" />
@@ -219,52 +206,52 @@ function OverviewTab() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="card">
-          <div className="card-header">
-            <h3 className="card-title">Quick Actions</h3>
-            <p className="card-subtitle">Common tasks and shortcuts</p>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-300">
+          <div className="border-b border-gray-200 pb-4 mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
+            <p className="text-sm text-gray-600 mt-1">Common tasks and shortcuts</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <button className="btn-primary">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2">
               <Bot className="h-4 w-4" />
               Create Agent
             </button>
-            <button className="btn-secondary">
+            <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               Start Chat
             </button>
-            <button className="btn-success">
+            <button className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2">
               <Zap className="h-4 w-4" />
               Add Integration
             </button>
-            <button className="btn-warning">
+            <button className="bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               View Reports
             </button>
           </div>
         </div>
 
-        <div className="card">
-          <div className="card-header">
-            <h3 className="card-title">System Health</h3>
-            <p className="card-subtitle">Current platform status</p>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-300">
+          <div className="border-b border-gray-200 pb-4 mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">System Health</h3>
+            <p className="text-sm text-gray-600 mt-1">Current platform status</p>
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-600">API Status</span>
-              <span className="status-badge status-active">Healthy</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Healthy</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-600">Database</span>
-              <span className="status-badge status-active">Connected</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Connected</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-600">Agents</span>
-              <span className="status-badge status-active">12 Running</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">12 Running</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-600">Security</span>
-              <span className="status-badge status-active">Protected</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Protected</span>
             </div>
           </div>
         </div>
@@ -281,16 +268,16 @@ function AgentsTab() {
           <h2 className="text-4xl font-bold text-gray-900 mb-3">AI Agents</h2>
           <p className="text-xl text-gray-600">Manage and monitor your AI agents</p>
         </div>
-        <button className="btn-primary hover-glow">
+        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 hover:shadow-lg hover:shadow-blue-500/25">
           <Bot className="h-4 w-4" />
           Create New Agent
         </button>
       </div>
       
-      <div className="card animate-fade-in">
-        <div className="card-header">
-          <h3 className="card-title">Agent Endpoints</h3>
-          <p className="card-subtitle">Available API endpoints for agent management</p>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-300 animate-fade-in">
+        <div className="border-b border-gray-200 pb-4 mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Agent Endpoints</h3>
+          <p className="text-sm text-gray-600 mt-1">Available API endpoints for agent management</p>
         </div>
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
@@ -304,7 +291,7 @@ function AgentsTab() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="status-badge status-active">Active</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </div>
           </div>
@@ -320,7 +307,7 @@ function AgentsTab() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="status-badge status-active">Active</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </div>
           </div>
@@ -336,7 +323,7 @@ function AgentsTab() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="status-badge status-active">Active</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </div>
           </div>
@@ -354,10 +341,10 @@ function ConversationsTab() {
         <p className="text-xl text-gray-600">Monitor agent conversations and interactions</p>
       </div>
       
-      <div className="card animate-fade-in">
-        <div className="card-header">
-          <h3 className="card-title">Conversation Endpoints</h3>
-          <p className="card-subtitle">API endpoints for managing conversations</p>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-300 animate-fade-in">
+        <div className="border-b border-gray-200 pb-4 mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Conversation Endpoints</h3>
+          <p className="text-sm text-gray-600 mt-1">API endpoints for managing conversations</p>
         </div>
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg border border-purple-200">
@@ -371,7 +358,7 @@ function ConversationsTab() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="status-badge status-active">Active</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </div>
           </div>
@@ -387,7 +374,7 @@ function ConversationsTab() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="status-badge status-active">Active</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </div>
           </div>
@@ -405,10 +392,10 @@ function AnalyticsTab() {
         <p className="text-xl text-gray-600">Track performance metrics and ROI</p>
       </div>
       
-      <div className="card animate-fade-in">
-        <div className="card-header">
-          <h3 className="card-title">Analytics Endpoints</h3>
-          <p className="card-subtitle">API endpoints for performance tracking</p>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-300 animate-fade-in">
+        <div className="border-b border-gray-200 pb-4 mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Analytics Endpoints</h3>
+          <p className="text-sm text-gray-600 mt-1">API endpoints for performance tracking</p>
         </div>
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg border border-orange-200">
@@ -422,7 +409,7 @@ function AnalyticsTab() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="status-badge status-active">Active</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </div>
           </div>
@@ -438,7 +425,7 @@ function AnalyticsTab() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="status-badge status-active">Active</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </div>
           </div>
@@ -456,16 +443,16 @@ function IntegrationsTab() {
           <h2 className="text-4xl font-bold text-gray-900 mb-3">Integrations</h2>
           <p className="text-xl text-gray-600">Manage third-party service connections</p>
         </div>
-        <button className="btn-primary hover-glow">
+        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 hover:shadow-lg hover:shadow-blue-500/25">
           <Zap className="h-4 w-4" />
           Add Integration
         </button>
       </div>
       
-      <div className="card animate-fade-in">
-        <div className="card-header">
-          <h3 className="card-title">Integration Endpoints</h3>
-          <p className="card-subtitle">API endpoints for managing integrations</p>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-300 animate-fade-in">
+        <div className="border-b border-gray-200 pb-4 mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Integration Endpoints</h3>
+          <p className="text-sm text-gray-600 mt-1">API endpoints for managing integrations</p>
         </div>
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-lg border border-yellow-200">
@@ -479,7 +466,7 @@ function IntegrationsTab() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="status-badge status-active">Active</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </div>
           </div>
@@ -495,7 +482,7 @@ function IntegrationsTab() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="status-badge status-active">Active</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </div>
           </div>
@@ -513,10 +500,10 @@ function UsersTab() {
         <p className="text-xl text-gray-600">Manage user accounts and permissions</p>
       </div>
       
-      <div className="card animate-fade-in">
-        <div className="card-header">
-          <h3 className="card-title">User Endpoints</h3>
-          <p className="card-subtitle">API endpoints for user management</p>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-300 animate-fade-in">
+        <div className="border-b border-gray-200 pb-4 mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">User Endpoints</h3>
+          <p className="text-sm text-gray-600 mt-1">API endpoints for user management</p>
         </div>
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
@@ -530,7 +517,7 @@ function UsersTab() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="status-badge status-active">Active</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </div>
           </div>
@@ -546,7 +533,7 @@ function UsersTab() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="status-badge status-active">Active</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </div>
           </div>
@@ -565,10 +552,10 @@ function APIStatusTab() {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="card animate-fade-in">
-          <div className="card-header">
-            <h3 className="card-title">Health Check</h3>
-            <p className="card-subtitle">System health status</p>
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300 animate-fade-in">
+          <div className="border-b border-gray-200 pb-4 mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Health Check</h3>
+            <p className="text-sm text-gray-600 mt-1">System health status</p>
           </div>
           <div className="space-y-4">
             <div className="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
@@ -581,7 +568,7 @@ function APIStatusTab() {
                   <p className="text-xs text-gray-500 mt-1">System health status</p>
                 </div>
               </div>
-              <span className="status-badge status-active">Healthy</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Healthy</span>
             </div>
             
             <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border border-blue-200">
@@ -594,15 +581,15 @@ function APIStatusTab() {
                   <p className="text-xs text-gray-500 mt-1">API operational status</p>
                 </div>
               </div>
-              <span className="status-badge status-active">Operational</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Operational</span>
             </div>
           </div>
         </div>
         
-        <div className="card animate-fade-in">
-          <div className="card-header">
-            <h3 className="card-title">Documentation</h3>
-            <p className="card-subtitle">API documentation access</p>
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300 animate-fade-in">
+          <div className="border-b border-gray-200 pb-4 mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Documentation</h3>
+            <p className="text-sm text-gray-600 mt-1">API documentation access</p>
           </div>
           <div className="space-y-4">
             <div className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg border border-purple-200">
@@ -615,7 +602,7 @@ function APIStatusTab() {
                   <p className="text-xs text-gray-500 mt-1">Interactive API docs</p>
                 </div>
               </div>
-              <span className="status-badge status-active">Available</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Available</span>
             </div>
             
             <div className="flex items-center justify-between p-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
@@ -628,7 +615,7 @@ function APIStatusTab() {
                   <p className="text-xs text-gray-500 mt-1">Alternative API docs</p>
                 </div>
               </div>
-              <span className="status-badge status-active">Available</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Available</span>
             </div>
           </div>
         </div>
@@ -645,10 +632,10 @@ function DatabaseTab() {
         <p className="text-xl text-gray-600">Monitor database performance and connections</p>
       </div>
       
-      <div className="card animate-fade-in">
-        <div className="card-header">
-          <h3 className="card-title">Database Status</h3>
-          <p className="card-subtitle">Current database health and configuration</p>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-300 animate-fade-in">
+        <div className="border-b border-gray-200 pb-4 mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Database Status</h3>
+          <p className="text-sm text-gray-600 mt-1">Current database health and configuration</p>
         </div>
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
@@ -661,7 +648,7 @@ function DatabaseTab() {
                 <p className="text-xs text-gray-500 mt-1">PostgreSQL connection pool</p>
               </div>
             </div>
-            <span className="status-badge status-active">Connected</span>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Connected</span>
           </div>
           
           <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border border-blue-200">
@@ -687,7 +674,7 @@ function DatabaseTab() {
                 <p className="text-xs text-gray-500 mt-1">pgvector for embeddings</p>
               </div>
             </div>
-            <span className="status-badge status-active">pgvector Active</span>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">pgvector Active</span>
           </div>
         </div>
       </div>
@@ -703,10 +690,10 @@ function SecurityTab() {
         <p className="text-xl text-gray-600">Monitor security settings and compliance</p>
       </div>
       
-      <div className="card animate-fade-in">
-        <div className="card-header">
-          <h3 className="card-title">Security Features</h3>
-          <p className="card-subtitle">Active security measures and compliance status</p>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-300 animate-fade-in">
+        <div className="border-b border-gray-200 pb-4 mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Security Features</h3>
+          <p className="text-sm text-gray-600 mt-1">Active security measures and compliance status</p>
         </div>
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
@@ -719,7 +706,7 @@ function SecurityTab() {
                 <p className="text-xs text-gray-500 mt-1">JWT-based authentication system</p>
               </div>
             </div>
-            <span className="status-badge status-active">JWT Active</span>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">JWT Active</span>
           </div>
           
           <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border border-blue-200">
@@ -732,7 +719,7 @@ function SecurityTab() {
                 <p className="text-xs text-gray-500 mt-1">Cross-origin resource sharing</p>
               </div>
             </div>
-            <span className="status-badge status-active">Enabled</span>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Enabled</span>
           </div>
           
           <div className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-lg border border-yellow-200">
@@ -745,7 +732,7 @@ function SecurityTab() {
                 <p className="text-xs text-gray-500 mt-1">API request throttling</p>
               </div>
             </div>
-            <span className="status-badge status-warning">Configured</span>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Configured</span>
           </div>
         </div>
       </div>
