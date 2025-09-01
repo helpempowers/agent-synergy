@@ -210,10 +210,10 @@ async def get_roi_metrics(credentials: HTTPAuthorizationCredentials = Depends(se
 
 @router.get("/conversations")
 async def get_conversation_analytics(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    days: int = 30
+    timeframe: str = "30d",
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
-    """Get conversation analytics for the specified period"""
+    """Get conversation analytics for the current user"""
     try:
         # Get current user
         token = credentials.credentials
@@ -227,36 +227,49 @@ async def get_conversation_analytics(
         
         supabase = get_supabase()
         
-        # Get conversations for the specified period
-        start_date = (datetime.utcnow() - timedelta(days=days)).isoformat()
-        conversations_result = supabase.table('conversations').select('*').eq('user_id', user_id).gte('created_at', start_date).execute()
+        # Calculate date range based on timeframe
+        if timeframe == "7d":
+            start_date = datetime.utcnow() - timedelta(days=7)
+        elif timeframe == "30d":
+            start_date = datetime.utcnow() - timedelta(days=30)
+        elif timeframe == "90d":
+            start_date = datetime.utcnow() - timedelta(days=90)
+        else:
+            start_date = datetime.utcnow() - timedelta(days=30)
+        
+        # Get conversations in date range
+        conversations_result = supabase.table('conversations').select('*').eq('user_id', user_id).gte('created_at', start_date.isoformat()).execute()
         conversations = conversations_result.data or []
         
-        # Analyze conversations
+        # Calculate metrics
         total_conversations = len(conversations)
-        conversations_by_status = {}
-        conversations_by_type = {}
-        daily_conversations = {}
+        completed_conversations = len([c for c in conversations if c['status'] == 'completed'])
+        failed_conversations = len([c for c in conversations if c['status'] == 'failed'])
+        active_conversations = len([c for c in conversations if c['status'] == 'active'])
         
-        for conversation in conversations:
-            # Status breakdown
-            status = conversation['status']
-            conversations_by_status[status] = conversations_by_status.get(status, 0) + 1
-            
-            # Type breakdown
-            conv_type = conversation['conversation_type']
+        success_rate = (completed_conversations / total_conversations * 100) if total_conversations > 0 else 0
+        
+        # Group by conversation type
+        conversations_by_type = {}
+        for conv in conversations:
+            conv_type = conv.get('conversation_type', 'unknown')
             conversations_by_type[conv_type] = conversations_by_type.get(conv_type, 0) + 1
-            
-            # Daily breakdown
-            date = conversation['created_at'][:10]
+        
+        # Daily breakdown
+        daily_conversations = {}
+        for conv in conversations:
+            date = conv['created_at'][:10]  # YYYY-MM-DD
             daily_conversations[date] = daily_conversations.get(date, 0) + 1
         
         analytics = {
+            "timeframe": timeframe,
             "total_conversations": total_conversations,
-            "conversations_by_status": conversations_by_status,
+            "completed_conversations": completed_conversations,
+            "failed_conversations": failed_conversations,
+            "active_conversations": active_conversations,
+            "success_rate": round(success_rate, 2),
             "conversations_by_type": conversations_by_type,
-            "daily_conversations": daily_conversations,
-            "period_days": days
+            "daily_conversations": daily_conversations
         }
         
         return analytics
@@ -267,6 +280,145 @@ async def get_conversation_analytics(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get conversation analytics: {str(e)}"
+        )
+
+@router.get("/costs")
+async def get_cost_analytics(
+    timeframe: str = "30d",
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Get cost analytics for the current user"""
+    try:
+        # Get current user
+        token = credentials.credentials
+        user_id = auth_service.get_user_id_from_token(token)
+        
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token"
+            )
+        
+        supabase = get_supabase()
+        
+        # Calculate date range
+        if timeframe == "7d":
+            start_date = datetime.utcnow() - timedelta(days=7)
+        elif timeframe == "30d":
+            start_date = datetime.utcnow() - timedelta(days=30)
+        elif timeframe == "90d":
+            start_date = datetime.utcnow() - timedelta(days=90)
+        else:
+            start_date = datetime.utcnow() - timedelta(days=30)
+        
+        # Get conversations with cost data
+        conversations_result = supabase.table('conversations').select('*').eq('user_id', user_id).gte('created_at', start_date.isoformat()).execute()
+        conversations = conversations_result.data or []
+        
+        # Calculate costs
+        total_cost = sum(float(c.get('cost', 0)) for c in conversations)
+        avg_cost_per_conversation = total_cost / len(conversations) if conversations else 0
+        
+        # Cost by agent
+        cost_by_agent = {}
+        for conv in conversations:
+            agent_id = conv.get('agent_id')
+            cost = float(conv.get('cost', 0))
+            if agent_id:
+                cost_by_agent[agent_id] = cost_by_agent.get(agent_id, 0) + cost
+        
+        # Daily cost breakdown
+        daily_costs = {}
+        for conv in conversations:
+            date = conv['created_at'][:10]
+            cost = float(conv.get('cost', 0))
+            daily_costs[date] = daily_costs.get(date, 0) + cost
+        
+        cost_analytics = {
+            "timeframe": timeframe,
+            "total_cost": round(total_cost, 4),
+            "avg_cost_per_conversation": round(avg_cost_per_conversation, 4),
+            "total_conversations": len(conversations),
+            "cost_by_agent": cost_by_agent,
+            "daily_costs": daily_costs
+        }
+        
+        return cost_analytics
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get cost analytics: {str(e)}"
+        )
+
+@router.get("/roi")
+async def get_roi_analytics(
+    timeframe: str = "30d",
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Get ROI (Return on Investment) analytics"""
+    try:
+        # Get current user
+        token = credentials.credentials
+        user_id = auth_service.get_user_id_from_token(token)
+        
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token"
+            )
+        
+        supabase = get_supabase()
+        
+        # Calculate date range
+        if timeframe == "7d":
+            start_date = datetime.utcnow() - timedelta(days=7)
+        elif timeframe == "30d":
+            start_date = datetime.utcnow() - timedelta(days=30)
+        elif timeframe == "90d":
+            start_date = datetime.utcnow() - timedelta(days=90)
+        else:
+            start_date = datetime.utcnow() - timedelta(days=30)
+        
+        # Get conversations
+        conversations_result = supabase.table('conversations').select('*').eq('user_id', user_id).gte('created_at', start_date.isoformat()).execute()
+        conversations = conversations_result.data or []
+        
+        # Calculate ROI metrics
+        total_cost = sum(float(c.get('cost', 0)) for c in conversations)
+        
+        # Assume each conversation saves 15 minutes of human time at $50/hour
+        time_saved_hours = len(conversations) * 0.25  # 15 minutes = 0.25 hours
+        cost_savings = time_saved_hours * 50  # $50/hour
+        
+        # Calculate ROI
+        roi_percentage = ((cost_savings - total_cost) / total_cost * 100) if total_cost > 0 else 0
+        
+        # Break-even analysis
+        conversations_to_break_even = total_cost / (0.25 * 50) if total_cost > 0 else 0
+        
+        roi_analytics = {
+            "timeframe": timeframe,
+            "total_cost": round(total_cost, 2),
+            "time_saved_hours": round(time_saved_hours, 2),
+            "cost_savings": round(cost_savings, 2),
+            "net_savings": round(cost_savings - total_cost, 2),
+            "roi_percentage": round(roi_percentage, 2),
+            "conversations_to_break_even": round(conversations_to_break_even, 0),
+            "total_conversations": len(conversations),
+            "is_profitable": cost_savings > total_cost
+        }
+        
+        return roi_analytics
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get ROI analytics: {str(e)}"
         )
 
 @router.get("/trends")
