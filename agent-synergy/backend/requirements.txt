@@ -4,7 +4,7 @@ supabase==2.0.2
 python-dotenv==1.0.0
 crewai==0.11.0
 langchain-openai==0.0.2
-langchain==0.0.350
+langchain>=0.1.0,<0.2.0
 pydantic==2.5.0
 pydantic-settings==2.1.0
 python-multipart==0.0.6
@@ -19,3 +19,4 @@ redis==5.0.1
 celery==5.3.4
 httpx==0.24.1
 aiofiles==23.2.1
+email-validator==2.1.0

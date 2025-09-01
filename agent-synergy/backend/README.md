@@ -1,77 +1,33 @@
 # 🚀 Agent Synergy Backend
 
-*Plug-and-play AI agents that work like employees*
-
-## 📋 Overview
-
-Agent Synergy is a FastAPI-based backend service that provides AI agent management, conversation handling, and analytics for mid-market companies. The system enables companies to deploy, configure, and monitor AI agents that can handle customer support, QA testing, reporting, and other business tasks.
+**FastAPI backend for Agent Synergy - Plug-and-play AI agents that work like employees**
 
 ## 🏗️ Architecture
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │    Backend      │    │   External      │
-│   (Next.js)     │◄──►│   (FastAPI)     │◄──►│   Services      │
-│                 │    │                 │    │                 │
-│ • Dashboard     │    │ • Agent API     │    │ • OpenAI GPT-4o │
-│ • Agent Config  │    │ • Auth/Users    │    │ • Slack API     │
-│ • Analytics     │    │ • Integrations  │    │ • Google Sheets │
-│ • Billing       │    │ • Monitoring    │    │ • Jira API      │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Database      │    │   Agent Engine  │    │   Monitoring    │
-│   (Supabase)    │    │   (CrewAI)      │    │   (Grafana)     │
-│                 │    │                 │    │                 │
-│ • Users         │    │ • Support Agent │    │ • Uptime        │
-│ • Agents        │    │ • QA Agent      │    │ • Performance   │
-│ • Conversations │    │ • Workflows     │    │ • Costs         │
-│ • Analytics     │    │ • Memory        │    │ • Alerts        │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
-
-## 🚀 Features
-
-- **AI Agent Management**: Create, configure, and manage different types of AI agents
-- **Authentication & Authorization**: JWT-based user authentication with role-based access
-- **Conversation Handling**: Process and track conversations with AI agents
-- **Integration APIs**: Slack, Google Sheets, and Jira integrations
-- **Analytics & ROI**: Track agent performance and calculate cost savings
-- **Real-time Updates**: WebSocket support for live agent status updates
-
-## 🛠️ Tech Stack
-
-- **Backend Framework**: FastAPI (Python 3.8+)
+- **Framework**: FastAPI with Python 3.12
 - **Database**: Supabase (PostgreSQL)
-- **AI Engine**: CrewAI + LangChain
-- **LLM**: OpenAI GPT-4o
 - **Authentication**: JWT with bcrypt
-- **API Documentation**: Auto-generated with FastAPI
-- **Testing**: pytest
-- **Deployment**: Docker + Docker Compose
+- **AI Integration**: CrewAI, LangChain, OpenAI
+- **Task Queue**: Celery with Redis
+- **Documentation**: Auto-generated with Swagger UI
 
-## 📦 Installation
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Python 3.8 or higher
-- Node.js 16+ (for frontend)
+- Python 3.12+
+- Virtual environment
 - Supabase account
 - OpenAI API key
-- Slack app credentials (optional)
-- Google Cloud credentials (optional)
 
-### Backend Setup
+### Installation
 
-1. **Clone the repository**
+1. **Clone and navigate to backend**
 ```bash
-git clone <repository-url>
 cd agent-synergy/backend
 ```
 
-2. **Create virtual environment**
+2. **Create and activate virtual environment**
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
@@ -82,341 +38,163 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. **Environment Configuration**
+4. **Set up environment variables**
 ```bash
 cp env_example.txt .env
 # Edit .env with your actual credentials
 ```
 
-5. **Database Setup**
+5. **Run the server**
 ```bash
-# Create tables in Supabase (run in SQL editor)
-CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  email TEXT UNIQUE NOT NULL,
-  company_name TEXT,
-  company_size TEXT,
-  first_name TEXT,
-  last_name TEXT,
-  hashed_password TEXT NOT NULL,
-  is_active BOOLEAN DEFAULT TRUE,
-  is_verified BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP,
-  last_login TIMESTAMP
-);
-
-CREATE TABLE agents (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id),
-  name TEXT NOT NULL,
-  agent_type TEXT NOT NULL,
-  description TEXT,
-  config JSONB,
-  status TEXT DEFAULT 'inactive',
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP
-);
-
-CREATE TABLE conversations (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  agent_id UUID REFERENCES agents(id),
-  user_id UUID REFERENCES users(id),
-  message TEXT NOT NULL,
-  response TEXT,
-  conversation_type TEXT NOT NULL,
-  metadata JSONB,
-  status TEXT DEFAULT 'pending',
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP,
-  processing_time FLOAT,
-  cost FLOAT,
-  error_message TEXT,
-  tokens_used INTEGER,
-  model_used TEXT
-);
-
-CREATE TABLE integrations (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id),
-  platform TEXT NOT NULL,
-  config JSONB,
-  status TEXT DEFAULT 'inactive',
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP
-);
+python run.py
 ```
 
-6. **Run the application**
-```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
+The API will be available at:
+- **API**: http://localhost:8000
+- **Documentation**: http://localhost:8000/docs
+- **Health Check**: http://localhost:8000/health
+
+## 📚 API Endpoints
+
+### Authentication
+- `POST /api/v1/auth/register` - Register new user
+- `POST /api/v1/auth/login` - Login user
+- `POST /api/v1/auth/refresh` - Refresh access token
+- `POST /api/v1/auth/logout` - Logout user
+
+### Users
+- `GET /api/v1/users/me` - Get current user profile
+- `PUT /api/v1/users/me` - Update user profile
+- `DELETE /api/v1/users/me` - Delete user account
+
+### Agents
+- `GET /api/v1/agents` - List user's agents
+- `POST /api/v1/agents` - Create new agent
+- `GET /api/v1/agents/{agent_id}` - Get agent details
+- `PUT /api/v1/agents/{agent_id}` - Update agent
+- `DELETE /api/v1/agents/{agent_id}` - Delete agent
+- `POST /api/v1/agents/{agent_id}/chat` - Chat with agent
+
+### Conversations
+- `GET /api/v1/conversations` - List conversations
+- `POST /api/v1/conversations` - Create conversation
+- `GET /api/v1/conversations/{conversation_id}` - Get conversation
+- `PUT /api/v1/conversations/{conversation_id}` - Update conversation
+- `DELETE /api/v1/conversations/{conversation_id}` - Delete conversation
+
+### Analytics
+- `GET /api/v1/analytics/overview` - Get analytics overview
+- `GET /api/v1/analytics/agents` - Get agent analytics
+- `GET /api/v1/analytics/conversations` - Get conversation analytics
+
+### Integrations
+- `GET /api/v1/integrations` - List integrations
+- `POST /api/v1/integrations/slack` - Connect Slack
+- `POST /api/v1/integrations/google-sheets` - Connect Google Sheets
 
 ## 🔧 Configuration
 
 ### Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `OPENAI_API_KEY` | OpenAI API key for GPT-4o | Yes |
-| `SUPABASE_URL` | Supabase project URL | Yes |
-| `SUPABASE_ANON_KEY` | Supabase anonymous key | Yes |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key | Yes |
-| `SECRET_KEY` | JWT secret key | Yes |
-| `SLACK_BOT_TOKEN` | Slack bot token | No |
-| `GOOGLE_SHEETS_CREDENTIALS_FILE` | Google service account file | No |
+Create a `.env` file with the following variables:
 
-### Supabase Configuration
+```env
+# OpenAI Configuration
+OPENAI_API_KEY=your_openai_api_key_here
 
-1. Create a new Supabase project
-2. Enable Row Level Security (RLS)
-3. Create the required tables
-4. Set up authentication policies
-5. Configure storage buckets (if needed)
+# Supabase Configuration
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
-## 📚 API Documentation
+# Security
+SECRET_KEY=your_secret_key_for_jwt_tokens
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
 
-Once the server is running, visit:
-- **Interactive API Docs**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
-- **OpenAPI Schema**: http://localhost:8000/openapi.json
+# Server Configuration
+HOST=0.0.0.0
+PORT=8000
+DEBUG=True
+ENVIRONMENT=development
 
-### Key Endpoints
+# Redis Configuration
+REDIS_URL=redis://localhost:6379
+```
 
-#### Authentication
-- `POST /api/v1/auth/register` - User registration
-- `POST /api/v1/auth/login` - User login
-- `POST /api/v1/auth/refresh` - Refresh access token
-- `GET /api/v1/auth/me` - Get current user
+## 🗄️ Database Schema
 
-#### Agents
-- `POST /api/v1/agents/` - Create new agent
-- `GET /api/v1/agents/` - List user's agents
-- `GET /api/v1/agents/{id}` - Get specific agent
-- `PUT /api/v1/agents/{id}` - Update agent
-- `DELETE /api/v1/agents/{id}` - Delete agent
-- `POST /api/v1/agents/{id}/chat` - Chat with agent
+The backend uses Supabase (PostgreSQL) with the following main tables:
 
-#### Integrations
-- `GET /api/v1/integrations/` - List integrations
-- `POST /api/v1/integrations/slack` - Configure Slack
-- `POST /api/v1/integrations/google-sheets` - Configure Google Sheets
-- `POST /api/v1/integrations/jira` - Configure Jira
+- **users** - User accounts and profiles
+- **agents** - AI agent configurations
+- **conversations** - Chat conversations
+- **messages** - Individual chat messages
+- **integrations** - Third-party integrations
+- **analytics** - Usage analytics and metrics
 
-#### Analytics
-- `GET /api/v1/analytics/overview` - Analytics overview
-- `GET /api/v1/analytics/roi` - ROI metrics
-- `GET /api/v1/analytics/trends` - Trend analysis
+## 🤖 AI Agents
 
-## 🤖 Agent Types
+The backend supports multiple types of AI agents:
 
-### Support Agent
-- Handles customer support tickets
-- Answers FAQs based on company knowledge
-- Escalates complex issues
-- Integrates with help desk systems
+- **Support Agent** - Customer support and helpdesk
+- **QA Agent** - Quality assurance and testing
+- **Reporting Agent** - Data analysis and reporting
+- **Virtual Assistant** - General administrative tasks
+- **Lead Prospector** - Sales and lead generation
+- **Custom Agent** - Customized for specific needs
 
-### QA Agent
-- Automates web/app testing
-- Logs bugs and issues
-- Generates test reports
-- Integrates with Jira/Linear
+## 🔒 Security
 
-### Reporting Agent
-- Generates data-driven reports
-- Analyzes business metrics
-- Creates executive dashboards
-- Integrates with Google Sheets
+- JWT-based authentication
+- Password hashing with bcrypt
+- CORS protection
+- Input validation and sanitization
+- Rate limiting (planned)
 
-### Virtual Assistant
-- Manages scheduling and calendars
-- Handles email processing
-- Performs administrative tasks
-- Integrates with productivity tools
+## 📊 Monitoring
 
-## 🔗 Integrations
-
-### Slack Integration
-- Bot mentions and DMs
-- Channel message processing
-- Automated responses
-- Status updates
-
-### Google Sheets Integration
-- Read/write spreadsheet data
-- Automated report generation
-- Data processing workflows
-- Real-time updates
-
-### Jira Integration
-- Bug logging and tracking
-- Issue management
-- Workflow automation
-- Status synchronization
-
-## 📊 Analytics & ROI
-
-### Performance Metrics
-- Agent uptime and reliability
-- Conversation success rates
-- Response time analysis
-- Cost per conversation
-
-### ROI Calculation
-- Time saved per conversation
-- Cost savings vs. subscription
-- Break-even analysis
-- Trend analysis
-
-### Custom Dashboards
-- Real-time agent status
-- Performance trends
-- Cost analysis
-- User engagement metrics
+- Health check endpoint
+- Request logging
+- Error tracking
+- Performance metrics
+- Cost tracking for AI usage
 
 ## 🧪 Testing
 
-### Run Tests
+Run tests with:
 ```bash
-# Install test dependencies
-pip install pytest pytest-asyncio httpx
-
-# Run all tests
-pytest
-
-# Run specific test file
-pytest tests/test_agents.py
-
-# Run with coverage
-pytest --cov=app tests/
-```
-
-### Test Structure
-```
-tests/
-├── test_auth.py          # Authentication tests
-├── test_agents.py        # Agent management tests
-├── test_conversations.py # Conversation tests
-├── test_integrations.py  # Integration tests
-└── test_analytics.py     # Analytics tests
+python -m pytest test_basic.py
 ```
 
 ## 🚀 Deployment
 
-### Docker Deployment
+### Development
 ```bash
-# Build image
-docker build -t agent-synergy-backend .
-
-# Run container
-docker run -p 8000:8000 agent-synergy-backend
-
-# Using docker-compose
-docker-compose up -d
+python run.py
 ```
 
-### Production Considerations
-- Use environment-specific settings
-- Enable HTTPS with SSL certificates
-- Set up monitoring and logging
-- Configure rate limiting
-- Enable CORS for production domains
-- Set up backup and recovery
+### Production
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+```
 
-## 🔒 Security
+## 📝 API Documentation
 
-### Authentication
-- JWT tokens with configurable expiration
-- Password hashing with bcrypt
-- Role-based access control
-- Token refresh mechanism
-
-### Data Protection
-- Row Level Security (RLS) in Supabase
-- Encrypted API communications
-- Secure credential storage
-- Audit logging
-
-### API Security
-- Input validation with Pydantic
-- SQL injection prevention
-- Rate limiting
-- CORS configuration
-
-## 📈 Monitoring & Logging
-
-### Health Checks
-- `/health` - Basic health status
-- `/api/status` - API status information
-- Database connectivity checks
-- External service status
-
-### Logging
-- Structured logging with Python logging
-- Request/response logging
-- Error tracking and alerting
-- Performance metrics
-
-### Metrics
-- Request counts and response times
-- Error rates and types
-- Database query performance
-- Agent processing metrics
+Interactive API documentation is available at `/docs` when the server is running.
 
 ## 🤝 Contributing
 
-### Development Setup
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests for new functionality
+4. Add tests
 5. Submit a pull request
-
-### Code Standards
-- Follow PEP 8 style guidelines
-- Add type hints to all functions
-- Include docstrings for all classes and methods
-- Write comprehensive tests
-- Update documentation as needed
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is proprietary software for Agent Synergy.
 
 ## 🆘 Support
 
-### Getting Help
-- Check the API documentation at `/docs`
-- Review the troubleshooting guide
-- Open an issue on GitHub
-- Contact the development team
-
-### Common Issues
-- **Database Connection**: Verify Supabase credentials and network access
-- **OpenAI API**: Check API key validity and rate limits
-- **Authentication**: Ensure JWT tokens are properly formatted
-- **CORS Issues**: Verify allowed origins in configuration
-
-## 🗺️ Roadmap
-
-### Phase 1 (Q1 2026)
-- ✅ Basic agent management
-- ✅ Support agent implementation
-- ✅ Authentication system
-- ✅ Basic analytics
-
-### Phase 2 (Q2 2026)
-- 🚧 QA agent beta
-- 🚧 Advanced integrations
-- 🚧 Enhanced analytics
-- 🚧 Performance optimization
-
-### Phase 3 (Q3-Q4 2026)
-- 🚧 Report builder agent
-- 🚧 Multi-agent workflows
-- 🚧 Enterprise features
-- 🚧 Marketplace preparation
-
----
-
-**Agent Synergy** - Transforming how mid-market companies work with AI agents.
+For support, please contact the development team or create an issue in the repository.
